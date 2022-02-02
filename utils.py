@@ -1,4 +1,4 @@
-Dict(dict):
+class Dict(dict):
   """
   convert a dictionary into an object
   """
