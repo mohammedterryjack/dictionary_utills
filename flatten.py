@@ -19,18 +19,24 @@ def flatten(
 
 from typing import Any 
 
-def flatten(value:Any, parent_key:str='', sep:str='__') -> dict[str,str|bool|int|float]:
-    """Recursively flattens a nested dictionary with keys separated by '__'."""
+def flatten(value:Any, parent_key:str='', delim:str='__') -> dict[str,str|bool|int|float]:
+    """Recursively flattens a nested dictionary or list
+    
+    eg
+    {a:1, b:[2,3], c:{d:4}, e:[{f:5},{f:6}, [7, {f:8}]}
+    >>
+    {a:1, b__0:2, b__1:3, c__d:4, e__0__f:5, e__1__f:6, e__2__0:7, e__2__1__f:8}
+    """
     
     flattened = {}
     if isinstance(value, dict):
         for k, v in value.items():
-            new_key = f"{parent_key}{sep}{k}" if parent_key else k
-            flattened.update(flatten(v, new_key, sep))
+            child_key = f"{parent_key}{sep}{k}" if parent_key else k
+            flattened.update(flatten(value=v, parent_key=child_key, delim=delim))
     elif isinstance(value, list):
         for i, v in enumerate(value):
-            new_key = f"{parent_key}{sep}{i}" if parent_key else str(i)
-            flattened.update(flatten(v, new_key, sep))
+            child_key = f"{parent_key}{sep}{i}" if parent_key else str(i)
+            flattened.update(flatten(value=v, parent_key=child_key, delim=delim))
     else:
         flattened[parent_key] = value
     return flattened
